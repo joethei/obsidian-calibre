@@ -1,0 +1,41 @@
+{
+	"name": "obsidian-sample-plugin",
+	"version": "0.0.1",
+	"description": "This is a sample plugin for Obsidian.",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "node esbuild.config.mjs production",
+		"release": "standard-version"
+	},
+	"standard-version": {
+		"t": "",
+		"types": [
+			{
+				"type": "feat",
+				"section": "Features"
+			},
+			{
+				"type": "fix",
+				"section": "Fixes"
+			},
+			{
+				"type": "docs",
+				"section": "Documentation"
+			}
+		],
+		"header": "## Changelog"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^16.11.1",
+		"esbuild": "^0.13.12",
+		"obsidian": "^0.12.17",
+		"standard-version": "^9.3.2",
+		"tslib": "2.3.1",
+		"typescript": "4.4.4"
+	},
+	"dependencies": {}
+}
