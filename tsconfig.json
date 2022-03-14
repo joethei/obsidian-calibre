@@ -9,7 +9,11 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "lib": ["es2021"]
+    "lib": [
+		"es2021",
+		"dom"
+	],
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*", "src/*", "**/*.ts"],
   "exclude": ["node_modules/*"]

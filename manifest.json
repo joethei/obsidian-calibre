@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-plugin",
-	"name": "Plugin",
+	"id": "calibre-integration",
+	"name": "Calibre Integration",
 	"version": "0.0.1",
-	"minAppVersion": "0.12.19",
+	"minAppVersion": "0.13.14",
 	"description": "",
-	"author": "SkepticMystic",
-	"authorUrl": "https://github.com/SkepticMystic/",
+	"author": "Johannes Theiner",
+	"authorUrl": "https://github.com/joethei/",
 	"isDesktopOnly": false
 }
