@@ -30,3 +30,19 @@ img.calibre-suggest-cover {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.calibre-modal .data-wrapper {
+}
+
+.calibre-modal .data-wrapper .cover {
+	float: left;
+	max-width: 30%;
+	width: 30%;
+	height: 100%;
+}
+
+.calibre-modal .data-wrapper .metadata {
+	float: right;
+	width: 70%;
+	height: 100%;
+}

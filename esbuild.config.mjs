@@ -33,11 +33,6 @@ esbuild
 		sourcemap: prod ? false : "inline",
 		treeShaking: true,
 		outfile: "main.js",
-		plugins: [
-			//   sveltePlugin({
-			//     compilerOptions: { css: true },
-			//     preprocess: sveltePreprocess(),
-			//   }),
-		],
+		plugins: [],
 	})
 	.catch(() => process.exit(1));

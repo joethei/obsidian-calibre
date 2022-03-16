@@ -14,7 +14,7 @@ export function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
 
 	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
 	if (view) {
-		const appliedTemplate = applyTemplate(plugin, book, plugin.settings.template);
+		const appliedTemplate = applyTemplate(book, plugin.settings.template);
 
 		const editor = view.editor;
 
@@ -25,7 +25,7 @@ export function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
 }
 
 export async function createNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
-	const appliedTemplate = applyTemplate(plugin, book, plugin.settings.template);
+	const appliedTemplate = applyTemplate(book, plugin.settings.template);
 	const activeFile = plugin.app.workspace.getActiveFile();
 	let dir = plugin.app.fileManager.getNewFileParent(activeFile ? activeFile.path : "").path;
 
@@ -34,7 +34,7 @@ export async function createNote(plugin: CalibrePlugin, book: Book) : Promise<vo
 	}
 
 	//make sure there are no slashes in the title.
-	let filename = book.title.replace(/[\/\\:]/g, ' ');
+	const filename = book.title.replace(/[\/\\:]/g, ' ');
 
 	if (plugin.settings.askForFilename) {
 		const inputPrompt = new TextInputPrompt(plugin.app, t("specify_name"), t("cannot_contain") + " * \" \\ / < > : | ?", filename, filename);
@@ -73,7 +73,7 @@ async function createNewFile(plugin: CalibrePlugin, path: string, content: strin
 	new Notice("Created note");
 }
 
-function applyTemplate(plugin: CalibrePlugin, book: Book, template: string) : string {
+function applyTemplate(book: Book, template: string) : string {
 	nunjucks.configure({
 		autoescape: false
 	});

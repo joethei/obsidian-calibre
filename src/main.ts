@@ -1,41 +1,60 @@
 import {Plugin} from "obsidian";
-import {CalibreSettings, DEFAULT_SETTINGS, InfoDumpType} from "./interfaces";
-import {SettingTab} from "./SettingTab";
+import {InfoDumpType} from "./interfaces";
+import {SettingTab} from "./settings/SettingTab";
 import {BookSuggestModal} from "./modals/BookSuggestModal";
-import {getBooks} from "./queries";
+import {CalibreSettings, DEFAULT_SETTINGS} from "./settings/SettingData";
+import {CalibreContentServer, CalibreSource} from "./queries";
 
 export default class CalibrePlugin extends Plugin {
-  settings: CalibreSettings;
+	settings: CalibreSettings;
 
-  async onload() {
-    await this.loadSettings();
-    this.addSettingTab(new SettingTab(this.app, this));
-
-	this.addCommand({
-		id: "paste-book",
-		name: "Paste book info",
-		editorCallback: async () => {
-			new BookSuggestModal(this, Object.values(await getBooks(this.settings)), InfoDumpType.PASTE).open();
+	source: CalibreSource;
+	getSource() : CalibreSource {
+		if(!this.source) {
+			this.source = new CalibreContentServer(this.settings.server);
 		}
-	});
+		return this.source;
+	}
 
-	  this.addCommand({
-		  id: "create-note",
-		  name: "Create book note",
-		  callback: async () => {
-			  new BookSuggestModal(this, Object.values(await getBooks(this.settings)), InfoDumpType.CREATE).open();
-		  }
-	  });
+	async onload() {
+		await this.loadSettings();
+		this.addSettingTab(new SettingTab(this.app, this));
 
-  }
+		this.addCommand({
+			id: "paste-book",
+			name: "Paste book info",
+			editorCallback: async () => {
+				new BookSuggestModal(this, Object.values(await this.getSource().allBooks()), InfoDumpType.PASTE).open();
+			}
+		});
 
-  onunload() {}
+		this.addCommand({
+			id: "create-note",
+			name: "Create book note",
+			callback: async () => {
+				new BookSuggestModal(this, Object.values(await this.getSource().allBooks()), InfoDumpType.CREATE).open();
+			}
+		});
 
-  async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-  }
+		this.addCommand({
+			id: "show-info",
+			name: "Show book info",
+			callback: async () => {
+				new BookSuggestModal(this, Object.values(await this.getSource().allBooks()), InfoDumpType.SHOW).open();
+			}
+		});
 
-  async saveSettings() {
-    await this.saveData(this.settings);
-  }
+	}
+
+	onunload() {
+		console.log("unloading Calibre importer plugin");
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
 }

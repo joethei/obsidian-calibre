@@ -1,6 +1,6 @@
 {
-	"id": "calibre-integration",
-	"name": "Calibre Integration",
+	"id": "calibre-import",
+	"name": "Calibre Importer",
 	"version": "0.0.1",
 	"minAppVersion": "0.13.14",
 	"description": "",

@@ -1,12 +1,15 @@
 //taken from https://github.com/valentine195/obsidian-leaflet-plugin/blob/master/src/l10n/locale.ts
 import en from "./locales/en";
 import de from "./locales/de";
+import test from "./locales/test";
 
-const locale = window.moment.locale();
+/* istanbul ignore next */
+const locale = (window.moment) ? window.moment.locale() : "test";
 
 const localeMap: { [k: string]: Partial<typeof en> } = {
 	en,
 	de,
+	test,
 };
 
 const userLocale = localeMap[locale];

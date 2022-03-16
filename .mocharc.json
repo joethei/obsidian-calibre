@@ -1,0 +1,7 @@
+{
+	"require": [
+		"./registerTests.js",
+		"jsdom-global/register"
+	],
+	"reporter": "dot"
+}

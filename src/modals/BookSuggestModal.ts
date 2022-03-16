@@ -2,6 +2,7 @@ import {htmlToMarkdown, MarkdownRenderer, SuggestModal} from "obsidian";
 import CalibrePlugin from "../main";
 import {Book, InfoDumpType} from "../interfaces";
 import {createNote, pasteToNote} from "../templateProcessing";
+import {BookInfoModal} from "./BookInfoModal";
 
 export class BookSuggestModal extends SuggestModal<Book> {
 
@@ -26,12 +27,15 @@ export class BookSuggestModal extends SuggestModal<Book> {
 		});
 	}
 
-	async onChooseSuggestion(item: Book, evt: MouseEvent | KeyboardEvent): Promise<void> {
+	async onChooseSuggestion(item: Book, _: MouseEvent | KeyboardEvent): Promise<void> {
 		if(this.type === InfoDumpType.PASTE) {
 			await pasteToNote(this.plugin, item);
 		}
-		if(this.type == InfoDumpType.CREATE) {
+		if(this.type === InfoDumpType.CREATE) {
 			await createNote(this.plugin, item);
+		}
+		if(this.type === InfoDumpType.SHOW) {
+			new BookInfoModal(this.plugin, item).open();
 		}
 	}
 

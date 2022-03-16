@@ -15,3 +15,9 @@ Read only
 requires the use of the [Calibre content server](https://manual.calibre-ebook.com/server.html?highlight=apache)
 
 Using _calibre-web_ is not supported.
+
+
+# Annotations
+
+
+![](https://i.imgur.com/LQGMASb.png)
