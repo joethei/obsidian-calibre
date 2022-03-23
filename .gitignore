@@ -14,4 +14,6 @@ package-lock.json
 *.map
 
 # obsidian
-data.json
+.nyc_output
+coverage
+build

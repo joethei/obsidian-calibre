@@ -1,17 +1,17 @@
 import {Plugin} from "obsidian";
-import {InfoDumpType} from "./interfaces";
 import {SettingTab} from "./settings/SettingTab";
 import {BookSuggestModal} from "./modals/BookSuggestModal";
 import {CalibreSettings, DEFAULT_SETTINGS} from "./settings/SettingData";
-import {CalibreContentServer, CalibreSource} from "./queries";
+import CalibreContentServer from "./sources/CalibreContentServer";
+import CalibreSource from "./sources/CalibreSource";
 
 export default class CalibrePlugin extends Plugin {
 	settings: CalibreSettings;
 
-	source: CalibreSource;
+	private source: CalibreSource;
 	getSource() : CalibreSource {
 		if(!this.source) {
-			this.source = new CalibreContentServer(this.settings.server);
+			this.source = new CalibreContentServer(this.settings.server, this.settings.library);
 		}
 		return this.source;
 	}
@@ -21,26 +21,10 @@ export default class CalibrePlugin extends Plugin {
 		this.addSettingTab(new SettingTab(this.app, this));
 
 		this.addCommand({
-			id: "paste-book",
-			name: "Paste book info",
-			editorCallback: async () => {
-				new BookSuggestModal(this, Object.values(await this.getSource().allBooks()), InfoDumpType.PASTE).open();
-			}
-		});
-
-		this.addCommand({
-			id: "create-note",
-			name: "Create book note",
-			callback: async () => {
-				new BookSuggestModal(this, Object.values(await this.getSource().allBooks()), InfoDumpType.CREATE).open();
-			}
-		});
-
-		this.addCommand({
 			id: "show-info",
 			name: "Show book info",
 			callback: async () => {
-				new BookSuggestModal(this, Object.values(await this.getSource().allBooks()), InfoDumpType.SHOW).open();
+				new BookSuggestModal(this).open();
 			}
 		});
 
@@ -56,5 +40,7 @@ export default class CalibrePlugin extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+		this.source.setHostname(this.settings.server);
+		this.source.setLibrary(this.settings.library);
 	}
 }

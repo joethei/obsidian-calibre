@@ -1,4 +1,4 @@
-import {App, DropdownComponent, PluginSettingTab, SearchComponent, Setting} from "obsidian";
+import {App, debounce, DropdownComponent, PluginSettingTab, SearchComponent, Setting} from "obsidian";
 import CalibrePlugin from "../main";
 import {FolderSuggest} from "../FolderSuggestor";
 import t from "../l10n/locale";
@@ -11,6 +11,11 @@ export class SettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
+
+	debouncedSettingsSave = debounce(async () => {
+		await this.plugin.saveSettings();
+		this.display();
+	}, 2000, true);
 
 	display(): void {
 		const {containerEl} = this;
@@ -26,6 +31,26 @@ export class SettingTab extends PluginSettingTab {
 					.setPlaceholder(DEFAULT_SETTINGS.server)
 					.onChange(async (value) => {
 						this.plugin.settings.server = value;
+						this.debouncedSettingsSave();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName("Library")
+			.addDropdown(async dropdown => {
+				const libraries = await this.plugin.getSource().libraryInfo();
+				if(libraries === null) {
+					dropdown.setDisabled(true);
+					return;
+				}
+				for (const libraryKey in libraries.library_map) {
+					const library = libraries.library_map[libraryKey];
+					dropdown.addOption(libraryKey, library);
+				}
+				dropdown
+					.setValue(this.plugin.settings.library)
+					.onChange(async (value: string) => {
+						this.plugin.settings.library = value;
 						await this.plugin.saveSettings();
 					});
 			});

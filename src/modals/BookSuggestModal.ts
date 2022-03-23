@@ -1,42 +1,63 @@
-import {htmlToMarkdown, MarkdownRenderer, SuggestModal} from "obsidian";
+import {debounce, Debouncer, htmlToMarkdown, MarkdownRenderer, SuggestModal} from "obsidian";
 import CalibrePlugin from "../main";
-import {Book, InfoDumpType} from "../interfaces";
+import {Book} from "../interfaces";
 import {createNote, pasteToNote} from "../templateProcessing";
 import {BookInfoModal} from "./BookInfoModal";
 
 export class BookSuggestModal extends SuggestModal<Book> {
+	private readonly plugin: CalibrePlugin;
 
-	plugin: CalibrePlugin;
-	books: Book[];
-	type: InfoDumpType;
+	private results: Book[] = [];
+	private query: string;
 
-	constructor(plugin: CalibrePlugin, books: Book[], type: InfoDumpType) {
+	private readonly debouncedSearch: Debouncer<[query: string]>;
+
+	constructor(plugin: CalibrePlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
-		this.books = books;
-		this.type = type;
-		this.limit = 10;
+		this.limit = 25;
+		this.debouncedSearch = debounce(this.updateSearchResults, 500);
+
+		this.setPlaceholder("Please search here");
+
+		this.setInstructions([
+			{
+				command: "Enter",
+				purpose: "Show information about Book"
+			},
+			{
+				command: "Shift+Enter",
+				purpose: "Create note"
+			}
+		]);
 	}
 
-	getSuggestions(query: string): Book[] {
-		return this.books.filter(book => {
-			return book.title.toLowerCase().includes(query.toLowerCase())
-				|| book.authors.join().toLowerCase().includes(query.toLowerCase());
-		}).sort((a, b) => {
-			return a.title.localeCompare(b.title);
-		});
-	}
-
-	async onChooseSuggestion(item: Book, _: MouseEvent | KeyboardEvent): Promise<void> {
-		if(this.type === InfoDumpType.PASTE) {
-			await pasteToNote(this.plugin, item);
+	async updateSearchResults(query: string) {
+		if(query !== this.query) {
+			this.query = query;
+			this.results = await this.plugin.getSource().search(query);
+			//@ts-ignore
+			this.updateSuggestions();
 		}
-		if(this.type === InfoDumpType.CREATE) {
+	}
+
+
+	async getSuggestions(query: string): Promise<Book[]> {
+		this.debouncedSearch(query);
+		return this.results;
+	}
+
+	async onChooseSuggestion(item: Book, event: MouseEvent | KeyboardEvent): Promise<void> {
+		if(event.getModifierState("Shift")) {
 			await createNote(this.plugin, item);
+			return;
 		}
-		if(this.type === InfoDumpType.SHOW) {
-			new BookInfoModal(this.plugin, item).open();
+		if(event.getModifierState("Alt")) {
+			await pasteToNote(this.plugin, item);
+			return;
 		}
+		new BookInfoModal(this.plugin, item).open();
+
 	}
 
 	async renderSuggestion(value: Book, el: HTMLElement): Promise<void> {

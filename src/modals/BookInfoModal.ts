@@ -2,7 +2,7 @@ import {
 	htmlToMarkdown,
 	MarkdownRenderer,
 
-	Modal, setIcon,
+	Modal, moment, setIcon,
 } from "obsidian";
 import {Book} from "../interfaces";
 import CalibrePlugin from "../main";
@@ -24,7 +24,7 @@ export class BookInfoModal extends Modal {
 		const {contentEl} = this;
 		contentEl.empty();
 
-		const topButtons = contentEl.createDiv('topButtons');
+		//const topButtons = contentEl.createDiv('topButtons');
 
 		contentEl.createEl("h1", {text: this.book.title});
 
@@ -38,6 +38,20 @@ export class BookInfoModal extends Modal {
 		metadata.createEl("strong", {text: t("written_by")});
 		metadata.createEl("span", {text: this.book.authors.join(" & ")});
 		metadata.createEl("br");
+
+		metadata.createEl("strong", {text: t("publisher")});
+		metadata.createEl("span", {text: this.book.publisher});
+		metadata.createEl("br");
+
+		metadata.createEl("strong", {text: t("publish_date")});
+		metadata.createEl("span", {text: moment(this.book.pubdate).format("DD.MM.YYYY")});
+		metadata.createEl("br");
+
+		if(this.book.series) {
+			metadata.createEl("strong", {text: t("series")});
+			metadata.createEl("span", {text: this.book.series});
+			metadata.createEl("br");
+		}
 
 		metadata.createEl("strong", {text: t("tags")});
 		const tagEl = metadata.createSpan("tags");
@@ -81,10 +95,10 @@ export class BookInfoModal extends Modal {
 			}
 		}
 
-		this.contentEl.createEl("hr");
+		metadata.createEl("hr");
 
 		if(this.book.comments) {
-			const comments = contentEl.createEl("div", {cls: ["comments"]});
+			const comments = metadata.createEl("div", {cls: ["comments"]});
 			await MarkdownRenderer.renderMarkdown(htmlToMarkdown(this.book.comments), comments, "", this.plugin);
 		}
 

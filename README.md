@@ -17,7 +17,12 @@ requires the use of the [Calibre content server](https://manual.calibre-ebook.co
 Using _calibre-web_ is not supported.
 
 
-# Annotations
+## Annotations
 
 
 ![](https://i.imgur.com/LQGMASb.png)
+
+## Search
+
+You can make full use of the Search syntax Calibre offers, see the
+[Documentation](https://manual.calibre-ebook.com/gui.html#the-search-interface) for more information.

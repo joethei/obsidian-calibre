@@ -1,5 +1,6 @@
 export interface CalibreSettings{
 	server: string,
+	library: string,
 	template: string,
 	saveLocation: string,
 	saveLocationFolder: string,
@@ -8,17 +9,23 @@ export interface CalibreSettings{
 
 export const DEFAULT_SETTINGS: CalibreSettings = {
 	server: "http://localhost:8080",
-	template: "# {{title}}\n" +
+	library: "",
+	template: "---\n" +
+		"cover: {{cover}}\n" +
+		"authors: {% for author in authors %}\n" +
+		"- {{author}}{% endfor %}\n" +
+		"---\n" +
 		"\n" +
-		"by:\n" +
-		"{{authors}}\n" +
+		"![cover|250]({{cover}})\n" +
+		"\n" +
+		"# {{title}}\n" +
 		"\n" +
 		"---\n" +
 		"{{comments}}\n" +
 		"\n" +
-		"---\n" +
 		"\n" +
-		"{{highlights}}",
+		"## Highlights\n" +
+		"{% for highlight in highlights %} -{{highlight.highlighted_text}}{% endfor %}",
 	saveLocation: "default",
 	saveLocationFolder: "",
 	askForFilename: true,

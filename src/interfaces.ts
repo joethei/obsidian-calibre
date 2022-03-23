@@ -1,9 +1,3 @@
-export enum InfoDumpType {
-	PASTE,
-	CREATE,
-	SHOW,
-}
-
 export interface Books {
 	[key: number]: Book,
 }
@@ -25,17 +19,31 @@ export interface Book {
 	rating: number,
 	formats: string[];
 	user_metadata: UserMetadataWrapper;
+	identifiers: BookIdentifiers;
+	highlights: Highlight[];
 	[key: string]: any;
 }
 
-export interface BookManifest extends Annotations{
+export interface BookIdentifiers {
+	[key: string]: string;
+}
+
+export interface BookManifest extends Annotation{
 	version: number;
 	toc: Chapter;
 	metadata: Book;
 }
 
 export interface Annotations {
-	annotations_map: Highlight[];
+	[key: string]: Annotation;
+}
+
+export interface Annotation {
+	annotations_map: AnnotationMap;
+}
+
+export interface AnnotationMap {
+	highlight: Highlight[];
 }
 
 export interface Highlight {

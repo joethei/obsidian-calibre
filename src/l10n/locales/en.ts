@@ -23,4 +23,10 @@ export default {
 	written_by: "written by: ",
 	tags: "Tags: ",
 	rating: "Rating: ",
+	publisher: "Publisher: ",
+	publish_date: "Published on: ",
+	last_modified: "Last modified: ",
+	series: "Series: ",
+	languages: "Languages: ",
+
 }

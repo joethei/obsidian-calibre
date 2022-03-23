@@ -5,7 +5,7 @@ import {MarkdownView, normalizePath, Notice, TextComponent} from "obsidian";
 import {TextInputPrompt} from "./modals/TextInputPrompt";
 import t from "./l10n/locale";
 
-export function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
+export async function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
 	const file = plugin.app.workspace.getActiveFile();
 	if (file === null) {
 		new Notice("no file active");
@@ -14,7 +14,7 @@ export function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
 
 	const view = plugin.app.workspace.getActiveViewOfType(MarkdownView);
 	if (view) {
-		const appliedTemplate = applyTemplate(book, plugin.settings.template);
+		const appliedTemplate = await applyTemplate(plugin, book, plugin.settings.template);
 
 		const editor = view.editor;
 
@@ -25,7 +25,7 @@ export function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
 }
 
 export async function createNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
-	const appliedTemplate = applyTemplate(book, plugin.settings.template);
+	const appliedTemplate = await applyTemplate(plugin, book, plugin.settings.template);
 	const activeFile = plugin.app.workspace.getActiveFile();
 	let dir = plugin.app.fileManager.getNewFileParent(activeFile ? activeFile.path : "").path;
 
@@ -73,7 +73,8 @@ async function createNewFile(plugin: CalibrePlugin, path: string, content: strin
 	new Notice("Created note");
 }
 
-function applyTemplate(book: Book, template: string) : string {
+async function applyTemplate(plugin: CalibrePlugin, book: Book, template: string) : Promise<string> {
+	book.highlights = await plugin.getSource().annotations(book);
 	nunjucks.configure({
 		autoescape: false
 	});
