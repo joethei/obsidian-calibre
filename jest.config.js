@@ -4,5 +4,6 @@ module.exports = {
 	collectCoverage: true,
 	testEnvironment: "jsdom",
 	moduleDirectories: ["node_modules", "src", "test"],
-	reporters: ["default", "jest-teamcity"]
+	coverageReporters: ["lcov", "text", "teamcity"],
+	testResultsProcessor: "jest-teamcity-reporter"
 };
