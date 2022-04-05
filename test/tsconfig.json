@@ -8,6 +8,10 @@
 		"isolatedModules": false,
 		"strict": false,
 		"noImplicitAny": false,
+		"types": [
+			"jest",
+			"node"
+		],
 		"typeRoots" : [
 			"../node_modules/@types"
 		]

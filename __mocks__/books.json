@@ -1,0 +1,62 @@
+{
+	"449": {
+		"identifiers": {
+			"dnb-idn": "974671169",
+			"isbn": "9783548234106",
+			"ddc": "820|B",
+			"google": "cDF5RAAACAAJ"
+		},
+		"user_categories": {},
+		"title": "1984 : Roman",
+		"cover": "/get/cover/449/eBooks",
+		"user_metadata": {
+			"#read": {
+				"name": "Gelesen",
+				"label": "read",
+				"display": {
+					"description": ""
+				}
+			},
+			"#type": {
+				"name": "Type",
+				"label": "type",
+				"display": {
+					"enum_values": [
+						"eBook",
+						"PaperBook",
+						"Magazine"
+					],
+					"enum_colors": [],
+					"use_decorations": 0,
+					"description": "Type"
+				},
+				"#value#": "PaperBook"
+			}
+		},
+		"rating": 4,
+		"comments": "Der Zukunftsroman 1984 beschreibt einen totalitären Staat",
+		"timestamp": "2021-12-28T18:47:33+00:00",
+		"last_modified": "2022-02-14T16:33:51+00:00",
+		"tags": [
+			"Belletristische Darstellung",
+			"Zukunft",
+			"paper",
+			"Polizeistaat"
+		],
+		"series": null,
+		"uuid": "84cba8a8-ce3a-432d-8a07-2b207e628642",
+		"publisher": "Ullstein",
+		"languages": [
+			"deu"
+		],
+		"application_id": 449,
+		"thumbnail": "/get/thumb/449/eBooks",
+		"pubdate": "1994-12-15T18:48:22+00:00",
+		"authors": [
+			"Orwell, George"
+		],
+		"formats": [],
+		"main_format": null,
+		"other_formats": {}
+	}
+}

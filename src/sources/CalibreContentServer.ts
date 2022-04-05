@@ -1,6 +1,6 @@
-import {htmlToMarkdown, requestUrl} from "obsidian";
 import {Annotations, Book, BookManifest, Books, BookSearchResults, Highlight, LibraryInfo} from "../interfaces";
 import CalibreSource from "./CalibreSource";
+import {htmlToMarkdown, requestUrl} from "obsidian";
 
 export default class CalibreContentServer implements CalibreSource {
 	hostname: string;
