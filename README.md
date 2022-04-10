@@ -28,6 +28,10 @@ Using _calibre-web_ is not supported.
 You can make full use of the Search syntax Calibre offers, see the
 [Documentation](https://manual.calibre-ebook.com/gui.html#the-search-interface) for more information.
 
+# Templates
+You have full access to
+[Nunjucks](https://mozilla.github.io/nunjucks/templating.html)
+
 
 # Contributing
 ![GitHub](https://shields.joethei.xyz/github/license/joethei/obsidian-calibre)

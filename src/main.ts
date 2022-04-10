@@ -1,4 +1,4 @@
-import {Plugin} from "obsidian";
+import {htmlToMarkdown, Plugin} from "obsidian";
 import {SettingTab} from "./settings/SettingTab";
 import {BookSuggestModal} from "./modals/BookSuggestModal";
 import {CalibreSettings, DEFAULT_SETTINGS} from "./settings/SettingData";
@@ -27,6 +27,17 @@ export default class CalibrePlugin extends Plugin {
 				new BookSuggestModal(this).open();
 			}
 		});
+
+		for (const file of this.app.vault.getFiles()) {
+			if(file.extension === "html") {
+				const content = await this.app.vault.read(file);
+				const md = htmlToMarkdown(content);
+				const newPath = file.path.replace(".html", ".md");
+				if(!await this.app.vault.adapter.exists(newPath)) {
+					await this.app.vault.create(newPath, md);
+				}
+			}
+		}
 
 	}
 

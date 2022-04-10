@@ -1,18 +1,16 @@
-import {Book, BookManifest, Books, Highlight, LibraryInfo} from "../interfaces";
+import {Book, BookManifest} from "./CalibreSourceTypes";
 
 export default interface CalibreSource {
 
-	allBooks(): Promise<Books|null>;
+	allBooks(): Promise<Book[]|null>;
 
 	book(id: number): Promise<Book|null>;
 
-	libraryInfo(): Promise<LibraryInfo|null>;
+	libraryInfo(): Promise<string[]|null>;
 
 	search(query: string): Promise<Book[]>;
 
 	manifest(id: number, format: string): Promise<BookManifest|null>;
-
-	annotations(book: Book): Promise<Highlight[]>;
 
 	setHostname(hostname: string) : void;
 

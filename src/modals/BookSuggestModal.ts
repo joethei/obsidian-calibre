@@ -1,35 +1,53 @@
-import {debounce, Debouncer, htmlToMarkdown, MarkdownRenderer, SuggestModal} from "obsidian";
+import {debounce, Debouncer, htmlToMarkdown, Instruction, MarkdownRenderer, SuggestModal} from "obsidian";
 import CalibrePlugin from "../main";
-import {Book} from "../interfaces";
 import {createNote, pasteToNote} from "../templateProcessing";
 import {BookInfoModal} from "./BookInfoModal";
+import {Book} from "../sources/CalibreSourceTypes";
 
 export class BookSuggestModal extends SuggestModal<Book> {
 	private readonly plugin: CalibrePlugin;
+	private select: boolean;
 
 	private results: Book[] = [];
 	private query: string;
 
 	private readonly debouncedSearch: Debouncer<[query: string]>;
 
-	constructor(plugin: CalibrePlugin) {
+	private resolve: (book: Book) => void;
+
+	constructor(plugin: CalibrePlugin, select = false) {
 		super(plugin.app);
 		this.plugin = plugin;
 		this.limit = 25;
+		this.select = select;
 		this.debouncedSearch = debounce(this.updateSearchResults, 500);
 
 		this.setPlaceholder("Please search here");
 
-		this.setInstructions([
-			{
-				command: "Enter",
-				purpose: "Show information about Book"
-			},
-			{
-				command: "Shift+Enter",
-				purpose: "Create note"
+		if(!select) {
+			const instructions: Instruction[] = [
+				{
+					command: "Enter",
+					purpose: "Show information about Book"
+				},
+				{
+					command: "Shift+Enter",
+					purpose: "Create note"
+				}
+			];
+
+			const activeFile = plugin.app.workspace.getActiveFile();
+			if (activeFile !== null) {
+				instructions.push({
+					command: "Alt+Enter",
+					purpose: "Paste to current note"
+				});
 			}
-		]);
+
+
+
+			this.setInstructions(instructions);
+		}
 	}
 
 	async updateSearchResults(query: string) {
@@ -48,6 +66,11 @@ export class BookSuggestModal extends SuggestModal<Book> {
 	}
 
 	async onChooseSuggestion(item: Book, event: MouseEvent | KeyboardEvent): Promise<void> {
+		if(this.select) {
+			this.resolve(item);
+			return;
+		}
+
 		if(event.getModifierState("Shift")) {
 			await createNote(this.plugin, item);
 			return;
@@ -65,12 +88,17 @@ export class BookSuggestModal extends SuggestModal<Book> {
 		const text = wrapper.createDiv({cls: ["calibre-suggest-text"]});
 		text.createEl("strong",{ text: value.title, cls: ["calibre-suggest-title"]});
 		text.createEl("small", { text: value.authors.join(", "), cls: ["calibre-suggest-authors"]});
-		if(value.comments) {
-			const comments = text.createEl("div", {cls: ["calibre-suggest-comments"]});
-			await MarkdownRenderer.renderMarkdown(htmlToMarkdown(value.comments), comments, "", this.plugin);
-		}
+
+		const comments = text.createEl("div", {cls: ["calibre-suggest-comments"]});
+		await MarkdownRenderer.renderMarkdown(htmlToMarkdown(value.description), comments, "", this.plugin);
+
 		const img = wrapper.createDiv({cls: ["calibre-suggest-img"]});
 		img.createEl("img", {attr: {src: value.cover, alt: "Cover"}, cls: ["calibre-suggest-cover"]});
+	}
+
+	async openAndGetValue(resolve: (book: Book) => void) : Promise<void> {
+		this.resolve = resolve;
+		await this.open();
 	}
 
 }

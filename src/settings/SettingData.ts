@@ -11,7 +11,6 @@ export const DEFAULT_SETTINGS: CalibreSettings = {
 	server: "http://localhost:8080",
 	library: "",
 	template: "---\n" +
-		"cover: {{cover}}\n" +
 		"authors: {% for author in authors %}\n" +
 		"- {{author}}{% endfor %}\n" +
 		"---\n" +
@@ -21,7 +20,7 @@ export const DEFAULT_SETTINGS: CalibreSettings = {
 		"# {{title}}\n" +
 		"\n" +
 		"---\n" +
-		"{{comments}}\n" +
+		"{{description}}\n" +
 		"\n" +
 		"\n" +
 		"## Highlights\n" +

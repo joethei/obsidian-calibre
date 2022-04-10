@@ -35,7 +35,7 @@ export class TextInputPrompt extends BaseModal {
 				.inputEl.setAttribute("size", "50");
 			this.textComponent = textComponent;
 		});
-		text.controlEl.addClass("rss-setting-input");
+		text.controlEl.addClass("calibre-setting-input");
 
 		new Setting(div).addButton((b) => {
 			b

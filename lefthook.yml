@@ -1,0 +1,12 @@
+pre-commit:
+    parallel: true
+    commands:
+        lint:
+            tags: frontend
+            run: yarn lint
+        lint-css:
+            tags: ui
+            run: yarn lint-css
+        test:
+            tags: testing
+            run: yarn test

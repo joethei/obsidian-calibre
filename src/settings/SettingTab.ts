@@ -3,6 +3,7 @@ import CalibrePlugin from "../main";
 import {FolderSuggest} from "../FolderSuggestor";
 import t from "../l10n/locale";
 import {DEFAULT_SETTINGS} from "./SettingData";
+import {TemplateEditorModal} from "../modals/TemplateEditor";
 
 export class SettingTab extends PluginSettingTab {
 	plugin: CalibrePlugin;
@@ -39,13 +40,12 @@ export class SettingTab extends PluginSettingTab {
 			.setName("Library")
 			.addDropdown(async dropdown => {
 				const libraries = await this.plugin.getSource().libraryInfo();
-				if(libraries === null) {
+				if (libraries === null) {
 					dropdown.setDisabled(true);
 					return;
 				}
-				for (const libraryKey in libraries.library_map) {
-					const library = libraries.library_map[libraryKey];
-					dropdown.addOption(libraryKey, library);
+				for (const library of libraries) {
+					dropdown.addOption(library, library);
 				}
 				dropdown
 					.setValue(this.plugin.settings.library)
@@ -57,16 +57,20 @@ export class SettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Template")
-			.addTextArea(text => {
-				text
-					.setValue(this.plugin.settings.template)
-					.setPlaceholder(DEFAULT_SETTINGS.template)
-					.onChange(async (value) => {
-						this.plugin.settings.template = value;
-						await this.plugin.saveSettings();
-					});
-				text.inputEl.setAttr("rows", 15);
-				text.inputEl.setAttr("cols", 50);
+			.addButton(async (button) => {
+				button
+					.setButtonText("Customize")
+					.onClick(async () => {
+						const modal = new TemplateEditorModal(this.plugin);
+						modal.onClose = async() => {
+							if(modal.saved) {
+								this.plugin.settings.template = modal.template;
+								await this.plugin.saveSettings();
+							}
+						}
+
+						modal.open();
+				});
 			});
 
 		new Setting(containerEl)

@@ -4,9 +4,9 @@ import {
 
 	Modal, moment, setIcon,
 } from "obsidian";
-import {Book} from "../interfaces";
 import CalibrePlugin from "../main";
 import t from "../l10n/locale";
+import {Book} from "../sources/CalibreSourceTypes";
 
 export class BookInfoModal extends Modal {
 	plugin: CalibrePlugin;
@@ -44,7 +44,7 @@ export class BookInfoModal extends Modal {
 		metadata.createEl("br");
 
 		metadata.createEl("strong", {text: t("publish_date")});
-		metadata.createEl("span", {text: moment(this.book.pubdate).format("DD.MM.YYYY")});
+		metadata.createEl("span", {text: moment(this.book.published).format("DD.MM.YYYY")});
 		metadata.createEl("br");
 
 		if(this.book.series) {
@@ -70,20 +70,18 @@ export class BookInfoModal extends Modal {
 		}
 
 
-		for (const key in this.book.user_metadata) {
-			const element = this.book.user_metadata[key];
-			const value = element["#value#"];
+		for (const custom of this.book.custom) {
 			const div = metadata.createEl("div");
-			if(!value) {
+			if(!custom.value) {
 				continue;
 			}
-			if(element.display.description !== "") {
-				div.createEl("strong", {text: element.display.description + ": "});
+			if(custom.description !== "") {
+				div.createEl("strong", {text: custom.description + ": "});
 			}else {
-				div.createEl("strong", {text: element.name + ": "});
+				div.createEl("strong", {text: custom.name + ": "});
 			}
-			if(element.datatype === "bool") {
-				if(!value) {
+			if(custom.datatype === "bool") {
+				if(!custom.value) {
 					const span = div.createSpan();
 					setIcon(span, "cross");
 				}else {
@@ -91,15 +89,15 @@ export class BookInfoModal extends Modal {
 					setIcon(span, "checkmark");
 				}
 			}else {
-				div.createEl("span", {text: value});
+				div.createEl("span", {text: custom.value});
 			}
 		}
 
 		metadata.createEl("hr");
 
-		if(this.book.comments) {
+		if(this.book.description) {
 			const comments = metadata.createEl("div", {cls: ["comments"]});
-			await MarkdownRenderer.renderMarkdown(htmlToMarkdown(this.book.comments), comments, "", this.plugin);
+			await MarkdownRenderer.renderMarkdown(htmlToMarkdown(this.book.description), comments, "", this.plugin);
 		}
 
 
