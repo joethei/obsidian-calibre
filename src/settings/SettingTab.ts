@@ -1,9 +1,9 @@
-import {App, debounce, DropdownComponent, PluginSettingTab, SearchComponent, Setting} from "obsidian";
+import {App, debounce, DropdownComponent, Notice, PluginSettingTab, SearchComponent, Setting} from "obsidian";
 import CalibrePlugin from "../main";
 import {FolderSuggest} from "../FolderSuggestor";
 import t from "../l10n/locale";
 import {DEFAULT_SETTINGS} from "./SettingData";
-import {TemplateEditorModal} from "../modals/TemplateEditor";
+import {TemplateEditorModal} from "../templating/TemplateEditor";
 
 export class SettingTab extends PluginSettingTab {
 	plugin: CalibrePlugin;
@@ -42,6 +42,7 @@ export class SettingTab extends PluginSettingTab {
 				const libraries = await this.plugin.getSource().libraryInfo();
 				if (libraries === null) {
 					dropdown.setDisabled(true);
+					new Notice(t("server_offline"));
 					return;
 				}
 				for (const library of libraries) {

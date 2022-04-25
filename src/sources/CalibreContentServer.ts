@@ -3,13 +3,14 @@ import {
 	CcsBook,
 	CcsBookManifest,
 	CcsBooks,
-	CcsBookSearchResults,
+	CcsBookSearchResults, CcsChapter,
 	CcsHighlight,
 	CcsLibraryInfo
 } from "./CalibreContentServerTypes";
 import CalibreSource from "./CalibreSource";
 import {htmlToMarkdown, requestUrl} from "obsidian";
-import {Book, BookManifest, CustomMetadata, Highlight} from "./CalibreSourceTypes";
+import {Book, BookManifest, Chapter, CustomMetadata, Format, Highlight} from "./CalibreSourceTypes";
+import {poll} from "../functions";
 
 export default class CalibreContentServer implements CalibreSource {
 	hostname: string;
@@ -59,12 +60,41 @@ export default class CalibreContentServer implements CalibreSource {
 		return result;
 	}
 
-	async manifest(id: number, format: string): Promise<BookManifest|null> {
-		const raw = await requestUrl({url: this.hostname + "/book-manifest/" + id + "/" + format});
-		if (raw.status !== 200) {
+	async manifest(book: Book): Promise<BookManifest|null> {
+		return poll(async () => {
+			const raw = await requestUrl({url: this.hostname + "/book-manifest/" + book.id + "/" + book.formats[0]});
+			if(raw.status !== 200) return false;
+			if(raw.json.job_status) return false;
+
+			return raw;
+		}).then(value => {
+			const rawManifest = value.json as CcsBookManifest;
+			if(!rawManifest.toc) return null;
+			const chapter = this.chapters(rawManifest.toc);
+
+			const manifest: BookManifest = {chapter: chapter};
+			return manifest;
+
+		}).catch(value => {
+			console.error(value);
 			return null;
+		});
+	}
+
+	private chapters(rawChapter: CcsChapter, level = 0) : Chapter {
+		const chapter: Chapter = {
+			children: [],
+			id: rawChapter.id,
+			title: rawChapter.title,
+			level: level
+
 		}
-		return raw.json as CcsBookManifest;
+		for (const child of rawChapter.children) {
+			const chapters = this.chapters(child, level + 1);
+			chapter.children.push(chapters);
+		}
+
+		return chapter;
 	}
 
 	async allBooks(): Promise<Book[]|null> {
@@ -83,9 +113,12 @@ export default class CalibreContentServer implements CalibreSource {
 		return result;
 	}
 
-	async convertBook(rawBook: CcsBook) : Promise<Book> {
+	async convertBook(rawBook: CcsBook) : Promise<Book|null> {
 		const customMetadata: CustomMetadata[] = [];
-		for (let userMetadataKey in rawBook.user_metadata) {
+		if(!rawBook) {
+			return null;
+		}
+		for (const userMetadataKey in rawBook.user_metadata) {
 			const element = rawBook.user_metadata[userMetadataKey];
 			customMetadata.push({
 				datatype: element.datatype,
@@ -96,12 +129,20 @@ export default class CalibreContentServer implements CalibreSource {
 			});
 		}
 
+		const formats = rawBook.main_format;
+		for (const key in rawBook.other_formats) {
+			formats[key] = rawBook.other_formats[key];
+		}
+
+		for (const key in formats) {
+			formats[key] = this.hostname + "/#book_id=" + rawBook.application_id + "&fmt=" + key + "&library_id=" + this.library + "&mode=read_book";
+		}
+
 		return {
 			authors: rawBook.authors,
-			chapters: undefined,
 			cover: this.hostname + rawBook.cover,
 			description: rawBook.comments ? htmlToMarkdown(rawBook.comments) : "",
-			formats: rawBook.formats,
+			formats: formats as Format,
 			highlights: await this.convertAnnotations(rawBook),
 			id: rawBook.application_id,
 			identifiers: rawBook.identifiers,
@@ -113,24 +154,38 @@ export default class CalibreContentServer implements CalibreSource {
 			series: rawBook.series,
 			tags: rawBook.tags,
 			title: rawBook.title,
-			custom: customMetadata
+			custom: customMetadata,
+			main_format: rawBook.main_format ? Object.keys(rawBook.main_format)[0] : ""
 		};
 	}
 
 	async convertAnnotations(rawBook: CcsBook) : Promise<Highlight[]> {
 		const result: Highlight[] = [];
 		const annotations = await this.annotations(rawBook);
+		if(!annotations) {
+			return result;
+		}
+		for (const annotation of annotations) {
+			result.push({
+				location: annotation.toc_family_titles,
+				text: annotation.highlighted_text,
+				timestamp: annotation.timestamp,
+				type: annotation.type,
+				which: annotation.style.which,
+				notes: annotation.notes
 
+			});
+		}
 
-		return [];
+		return result.reverse();
 	}
 
-	async annotations(book: CcsBook): Promise<CcsHighlight[]> {
+	private async annotations(book: CcsBook): Promise<CcsHighlight[]> {
 		const highlights: CcsHighlight[] = [];
 		for (const format of book.formats) {
 			const raw = await requestUrl({url: this.hostname + "/book-get-annotations/" + this.library + "/" + book.application_id + "-" + format});
 			if (raw.status !== 200) {
-				return undefined;
+				return null;
 			}
 
 			const annotations = Object.entries(raw.json as CcsAnnotations);

@@ -1,0 +1,10 @@
+[
+	{
+		"name": "Simple",
+		"content": "---\n{%-if rating %}rating: {{rating}}{% endif%}\nauthors: {% for author in authors%}\n- {{author}}\n{%- endfor%}\n---\n\n![cover|250]({{cover}})\n\n# {{title}}\nby {{authors | list }}\n\n---\n{{description}}\n\n{% if highlights.length > 0 %}\n## Highlights\n{% for highlight in highlights %} -{{highlight.highlighted_text}}{% endfor %}\n{% endif %}"
+	},
+	{
+		"name": "Full Metadata",
+		"content": "---\ncover: {{cover}}\ncalibreId: {{id}}\n{%if rating %}rating: {{rating}}{% endif%}\nauthors: {% for author in authors%}\n- {{author}}\n{%- endfor%}\n{% if tags.length > 0 -%}\ntags: {% for tag in tags %}\n- {{tag | strip}}\n{%- endfor%}\n{%endif-%}\n{%if published != \"None\" %}published: {{published}} {%endif -%}\n{%if languages.length > 0%}\nlanguages: {%for language in languages %}\n- {{language}}\n{%-endfor%}\n{%-endif-%}\n{% if formats.length > 0 -%}\nformats:\n{%for format in formats-%}\n- {{format}}\n{%- endfor -%}\n{%-endif -%}\n{%- if series -%}series: {{series}}{%- endif%}\n{%- for metadata in custom -%}\n{%if metadata.value !== null %}\n{{metadata.label}}: {{metadata.value}}\n{%- endif%}\n{%- endfor%}\n---\n\n![cover|250]({{cover}})\n\n# {{title}}\n\n---\n{{description}}\n\n{% if highlights.length > 0 %}\n## Highlights\n{% for highlight in highlights %} -{{highlight.text}}\n{% endfor %}\n{% endif %}"
+	}
+]

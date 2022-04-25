@@ -1,12 +1,13 @@
 import {
+	ButtonComponent,
 	htmlToMarkdown,
 	MarkdownRenderer,
-
 	Modal, moment, setIcon,
 } from "obsidian";
-import CalibrePlugin from "../main";
+import CalibrePlugin, {VIEW_ID} from "../main";
 import t from "../l10n/locale";
 import {Book} from "../sources/CalibreSourceTypes";
+import {createNote, pasteToNote} from "../templating/templateProcessing";
 
 export class BookInfoModal extends Modal {
 	plugin: CalibrePlugin;
@@ -24,7 +25,36 @@ export class BookInfoModal extends Modal {
 		const {contentEl} = this;
 		contentEl.empty();
 
-		//const topButtons = contentEl.createDiv('topButtons');
+		const topButtons = contentEl.createDiv('topButtons');
+
+		new ButtonComponent(topButtons)
+			.setIcon("create-new")
+			.setTooltip(t("create_note"))
+			.onClick(async() => {
+				await createNote(this.plugin, this.book);
+			});
+
+		if(this.plugin.app.workspace.getActiveFile()) {
+			new ButtonComponent(topButtons)
+				.setIcon("paste")
+				.setTooltip(t("paste_note"))
+				.onClick(async() => {
+					await pasteToNote(this.plugin, this.book);
+				});
+		}
+
+		for (const formatsKey in this.book.formats) {
+			new ButtonComponent(topButtons)
+				.setButtonText("open as " + formatsKey.toUpperCase())
+				.onClick(async() => {
+					await this.plugin.initLeaf();
+					await this.plugin.app.workspace.getLeavesOfType(VIEW_ID)[0].setEphemeralState({
+						book: this.book,
+						format: formatsKey
+					});
+					this.close();
+				});
+		}
 
 		contentEl.createEl("h1", {text: this.book.title});
 
@@ -47,7 +77,7 @@ export class BookInfoModal extends Modal {
 		metadata.createEl("span", {text: moment(this.book.published).format("DD.MM.YYYY")});
 		metadata.createEl("br");
 
-		if(this.book.series) {
+		if (this.book.series) {
 			metadata.createEl("strong", {text: t("series")});
 			metadata.createEl("span", {text: this.book.series});
 			metadata.createEl("br");
@@ -72,35 +102,54 @@ export class BookInfoModal extends Modal {
 
 		for (const custom of this.book.custom) {
 			const div = metadata.createEl("div");
-			if(!custom.value) {
+			if (!custom.value) {
 				continue;
 			}
-			if(custom.description !== "") {
+			if (custom.description !== "") {
 				div.createEl("strong", {text: custom.description + ": "});
-			}else {
+			} else {
 				div.createEl("strong", {text: custom.name + ": "});
 			}
-			if(custom.datatype === "bool") {
-				if(!custom.value) {
+			if (custom.datatype === "bool") {
+				if (!custom.value) {
 					const span = div.createSpan();
 					setIcon(span, "cross");
-				}else {
+				} else {
 					const span = div.createSpan();
 					setIcon(span, "checkmark");
 				}
-			}else {
+			} else {
 				div.createEl("span", {text: custom.value});
 			}
 		}
 
 		metadata.createEl("hr");
 
-		if(this.book.description) {
-			const comments = metadata.createEl("div", {cls: ["comments"]});
-			await MarkdownRenderer.renderMarkdown(htmlToMarkdown(this.book.description), comments, "", this.plugin);
+		if (this.book.description) {
+			const description = metadata.createDiv( {cls: ["description"]});
+			const html = this.book.description.replace(/\n/g, "<br>");
+			const markdown = htmlToMarkdown(html);
+			await MarkdownRenderer.renderMarkdown(markdown, description, "", this.plugin);
 		}
 
+		metadata.createEl("hr");
 
+		metadata.createEl("h3", {text: "Highlights"});
+
+		const highlightsDiv = metadata.createEl("ul", {cls: ["highlights"]});
+		for (const highlight of this.book.highlights) {
+			const span = highlightsDiv.createEl("li",{text: highlight.text});
+			if(highlight.type === "highlight") {
+				span.style.backgroundColor = highlight.which;
+			}
+			if(highlight.type === "builtin") {
+				span.style.textDecoration = 'underline';
+			}
+
+			if(highlight.notes) {
+				span.title = highlight.notes;
+			}
+		}
 	}
 
 	async onClose(): Promise<void> {

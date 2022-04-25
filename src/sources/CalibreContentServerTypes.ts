@@ -18,10 +18,16 @@ export interface CcsBook {
 	languages: string[];
 	rating: number,
 	formats: string[];
+	other_formats: CcsFormat;
+	main_format: CcsFormat;
 	user_metadata: CcsUserMetadataWrapper;
 	identifiers: CcsBookIdentifiers;
 	highlights: CcsHighlight[];
 	[key: string]: any;
+}
+
+export interface CcsFormat {
+	[key: string]: string;
 }
 
 export interface CcsBookIdentifiers {
@@ -49,12 +55,13 @@ export interface CcsAnnotationMap {
 export interface CcsHighlight {
 	highlighted_text: string;
 	type: string;
+	notes?: string;
 	timestamp: Date;
 	spine_index: number;
 	spine_name: string;
 	start_cfi: string;
 	end_cfi: string;
-	toc_family_titles: string;
+	toc_family_titles: string[];
 	style: CcsHighlightStyle;
 }
 

@@ -29,4 +29,9 @@ export default {
 	series: "Series: ",
 	languages: "Languages: ",
 
+	create_note: "Create note",
+	paste_note: "Paste to current note",
+
+	server_offline: "Cannot reach Calibre Content server"
+
 }

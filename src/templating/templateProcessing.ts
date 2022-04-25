@@ -1,10 +1,10 @@
-import CalibrePlugin from "./main";
-import * as nunjucks from 'nunjucks';
+import CalibrePlugin from "../main";
 import {MarkdownView, normalizePath, Notice, TextComponent} from "obsidian";
-import {TextInputPrompt} from "./modals/TextInputPrompt";
-import t from "./l10n/locale";
-import {Book} from "./sources/CalibreSourceTypes";
-import {FILE_NAME_REGEX} from "./sources/CalibreContentServerTypes";
+import {TextInputPrompt} from "../modals/TextInputPrompt";
+import t from "../l10n/locale";
+import {Book} from "../sources/CalibreSourceTypes";
+import {FILE_NAME_REGEX} from "../sources/CalibreContentServerTypes";
+import {Environment} from "nunjucks";
 
 export async function pasteToNote(plugin: CalibrePlugin, book: Book) : Promise<void> {
 	const file = plugin.app.workspace.getActiveFile();
@@ -74,16 +74,19 @@ async function createNewFile(plugin: CalibrePlugin, path: string, content: strin
 	new Notice("Created note");
 }
 
-export async function applyTemplate(plugin: CalibrePlugin, book: Book, template: string) : Promise<string> {
-	nunjucks.configure({
-		autoescape: false
+export async function applyTemplate(_: CalibrePlugin, book: Book, template: string, logError = true) : Promise<string> {
+	const env = new Environment();
+	env.addFilter("strip", (str: string) => {
+		return str.replace(/ /g, '');
 	});
 	try {
-		return nunjucks.renderString(template, book);
+		return env.renderString(template, book);
 	} catch (e: any) {
-		console.error(e);
-		new Notice("Error while processing template, please check the console for more information", 1000);
-		new Notice(e.message, 1000);
+		if(logError) {
+			console.error(e);
+			new Notice("Error while processing template, please check the console for more information", 1000);
+			new Notice(e.message, 1000);
+		}
 	}
 	return "";
 

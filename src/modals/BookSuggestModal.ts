@@ -1,12 +1,12 @@
 import {debounce, Debouncer, htmlToMarkdown, Instruction, MarkdownRenderer, SuggestModal} from "obsidian";
 import CalibrePlugin from "../main";
-import {createNote, pasteToNote} from "../templateProcessing";
+import {createNote, pasteToNote} from "../templating/templateProcessing";
 import {BookInfoModal} from "./BookInfoModal";
 import {Book} from "../sources/CalibreSourceTypes";
 
 export class BookSuggestModal extends SuggestModal<Book> {
 	private readonly plugin: CalibrePlugin;
-	private select: boolean;
+	private readonly select: boolean;
 
 	private results: Book[] = [];
 	private query: string;
@@ -20,7 +20,7 @@ export class BookSuggestModal extends SuggestModal<Book> {
 		this.plugin = plugin;
 		this.limit = 25;
 		this.select = select;
-		this.debouncedSearch = debounce(this.updateSearchResults, 500);
+		this.debouncedSearch = debounce(this.updateSearchResults, 700);
 
 		this.setPlaceholder("Please search here");
 
@@ -43,8 +43,6 @@ export class BookSuggestModal extends SuggestModal<Book> {
 					purpose: "Paste to current note"
 				});
 			}
-
-
 
 			this.setInstructions(instructions);
 		}
@@ -75,7 +73,7 @@ export class BookSuggestModal extends SuggestModal<Book> {
 			await createNote(this.plugin, item);
 			return;
 		}
-		if(event.getModifierState("Alt")) {
+		if(event.getModifierState("Alt") && this.plugin.app.workspace.getActiveFile()) {
 			await pasteToNote(this.plugin, item);
 			return;
 		}

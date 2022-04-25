@@ -1,15 +1,16 @@
-import {BaseModal} from "./BaseModal";
+import {BaseModal} from "../modals/BaseModal";
 import CalibrePlugin from "../main";
 import {MarkdownPreviewView, Setting} from "obsidian";
-import {CcsBook} from "../sources/CalibreContentServerTypes";
-import {BookSuggestModal} from "./BookSuggestModal";
-import {applyTemplate} from "../templateProcessing";
+import {BookSuggestModal} from "../modals/BookSuggestModal";
+import {applyTemplate} from "./templateProcessing";
 import t from "../l10n/locale";
+import {Book} from "../sources/CalibreSourceTypes";
+import {PredefinedTemplatesSelector} from "./PredefinedTemplatesSelector";
 
 export class TemplateEditorModal extends BaseModal {
 
 	private readonly plugin: CalibrePlugin;
-	private book: CcsBook;
+	private book: Book;
 	private templatePreview: HTMLDivElement;
 
 	template: string;
@@ -23,9 +24,9 @@ export class TemplateEditorModal extends BaseModal {
 	}
 
 	async showTemplatePreview(): Promise<void> {
-		const processed = await applyTemplate(this.plugin, this.book, this.template);
+		const processed = await applyTemplate(this.plugin, this.book, this.template, false);
 		this.templatePreview.empty();
-		if(processed.length === 0) {
+		if (processed.length === 0) {
 			this.templatePreview.createEl("h2", {text: "Could not render template"});
 			return;
 		}
@@ -54,6 +55,25 @@ export class TemplateEditorModal extends BaseModal {
 					});
 			});
 
+		new Setting(contentEl)
+			.setName("Predefined Templates")
+			.setDesc("Choose from a selection of predefined templates")
+			.setDisabled(!this.book)
+			.addButton(async (button) => {
+				button
+					.setDisabled(!this.book)
+					.setButtonText("Choose predefined Template")
+					.onClick(async () => {
+							const selection = new PredefinedTemplatesSelector(this.plugin, this.book);
+							await selection.openAndGetValue(async (template) => {
+								this.template = template.content;
+								await this.display();
+								await this.showTemplatePreview();
+							});
+						}
+					);
+			});
+
 		const templateEl = contentEl.createDiv({cls: "editor-section"});
 
 		new Setting(templateEl)
@@ -62,11 +82,11 @@ export class TemplateEditorModal extends BaseModal {
 					.setValue(this.template)
 					.onChange(async (value) => {
 						this.template = value;
-						if(this.book) {
+						if (this.book) {
 							await this.showTemplatePreview();
 						}
 					});
-				textArea.inputEl.setAttr("rows", 50);
+				textArea.inputEl.setAttr("rows", 100);
 				textArea.inputEl.setAttr("cols", 60);
 			});
 

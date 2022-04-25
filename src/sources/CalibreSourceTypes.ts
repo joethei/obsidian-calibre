@@ -11,11 +11,15 @@ export interface Book {
 	last_modified: Date;
 	languages: string[];
 	rating: number;
-	formats: string[];
+	formats: Format;
+	main_format: string;
 	highlights: Highlight[];
 	identifiers: Identifiers;
-	chapters: Chapter[];
 	custom: CustomMetadata[];
+}
+
+export interface Format {
+	[key: string]: string;
 }
 
 export interface CustomMetadata {
@@ -27,7 +31,7 @@ export interface CustomMetadata {
 }
 
 export interface BookManifest {
-
+	chapter: Chapter;
 }
 
 export interface Identifiers {
@@ -38,9 +42,10 @@ export interface Identifiers {
 export interface Highlight {
 	text: string;
 	timestamp: Date;
-	type: "color" | "";
+	type: string;
 	which: string;
 	location: string[];
+	notes?: string;
 
 }
 
@@ -48,4 +53,5 @@ export interface Chapter {
 	id: number;
 	title: string;
 	children: Chapter[];
+	level: number;
 }

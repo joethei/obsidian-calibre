@@ -1,7 +1,7 @@
 import t from "../src/l10n/locale";
 
 describe('translation', function () {
-	test('', function () {
+	test('returns correct value', function () {
 		expect(t("testingValue")).toEqual("Hello World");
 	});
 	test('fallback to default if no value in selected language', function () {

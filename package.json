@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-calibre",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Import book information from calibre into obsidian",
 	"main": "main.js",
 	"scripts": {

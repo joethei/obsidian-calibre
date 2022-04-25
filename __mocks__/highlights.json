@@ -1,0 +1,28 @@
+{
+	"449:epub": {
+		"last_read_positions": [],
+		"annotations_map": {
+			"highlight": [
+				{
+					"end_cfi": "/2/4/104",
+					"highlighted_text": "Wissenschaft ist die Suche nach Wahrheit.",
+					"spine_index": 11,
+					"spine_name": "OPS/xhtml/08_Chapter02.xhtml",
+					"start_cfi": "/2/4/102/1:137",
+					"style": {
+						"kind": "color",
+						"type": "builtin",
+						"which": "yellow"
+					},
+					"timestamp": "2021-12-26T07:10:04.407Z",
+					"toc_family_titles": [
+						"2",
+						"2.2"
+					],
+					"type": "highlight",
+					"uuid": "QXcKdXMQERODiavpq9BrDA"
+				}
+			]
+		}
+	}
+}

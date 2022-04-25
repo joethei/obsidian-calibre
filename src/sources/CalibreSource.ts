@@ -8,9 +8,9 @@ export default interface CalibreSource {
 
 	libraryInfo(): Promise<string[]|null>;
 
-	search(query: string): Promise<Book[]>;
+	manifest(book: Book) : Promise<BookManifest|null>;
 
-	manifest(id: number, format: string): Promise<BookManifest|null>;
+	search(query: string): Promise<Book[]>;
 
 	setHostname(hostname: string) : void;
 
