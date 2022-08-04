@@ -42,7 +42,7 @@
 		"@arkweid/lefthook": "0.7.7"
 	},
 	"dependencies": {
-		"obsidian": "0.13.30",
+		"obsidian": "0.15.9",
 		"tslib": "2.3.1",
 		"typescript": "4.4.4",
 		"nunjucks": "3.2.3",
